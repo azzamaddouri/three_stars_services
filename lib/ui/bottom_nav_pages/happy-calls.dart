@@ -1,0 +1,343 @@
+// ignore_for_file: prefer_final_fields, prefer_const_constructors, prefer_const_literals_to_create_immutables
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:three_stars_services/const/AppColors.dart';
+import 'package:three_stars_services/ui/claim_details_screen.dart';
+import 'package:three_stars_services/ui/claim_form.dart';
+import 'package:three_stars_services/ui/filter_screen.dart';
+import 'package:three_stars_services/ui/happy_call_details_screen.dart';
+import 'package:three_stars_services/ui/search_screen.dart';
+import 'package:three_stars_services/widgets/customButton.dart';
+
+class HappyCalls extends StatefulWidget {
+  HappyCalls({Key? key}) : super(key: key);
+
+  @override
+  State<HappyCalls> createState() => _HappyCallsState();
+}
+
+class _HappyCallsState extends State<HappyCalls> {
+  List _claims = [];
+  bool floatbuttonvisible = true;
+  var _firestoreInstance = FirebaseFirestore.instance;
+  fetchProducts() async {
+    QuerySnapshot qn =
+        await _firestoreInstance.collection("claims-form-data").get();
+    setState(() {
+      for (int i = 0; i < qn.docs.length; i++) {
+        if (qn.docs[i]["Status"] == "Complete") {
+          _claims.add({
+            "Client": qn.docs[i]["Client"],
+            "Product": qn.docs[i]["Product"],
+            "CreatedAt": qn.docs[i]["CreatedAt"].toDate(),
+            "Status": qn.docs[i]["Status"],
+            "Reason": qn.docs[i]["Reason"],
+            "Id": qn.docs[i]["Id"],
+            "Diagnosis": qn.docs[i]["Diagnosis"],
+            "Quote": qn.docs[i]["Quote"],
+            "Interventions": qn.docs[i]["Interventions"],
+          });
+        }
+      }
+    });
+
+    return qn.docs;
+  }
+
+  @override
+  void initState() {
+    fetchProducts();
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SafeArea(
+          child: Container(
+              child: Column(children: [
+        Padding(
+            padding: EdgeInsets.only(left: 10.w, right: 10.w),
+            child: Row(children: [
+              Expanded(
+                  child: SizedBox(
+                      height: 60.h,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          boxShadow: [
+                            BoxShadow(
+                              //<-- SEE HERE
+                              color: Colors.black.withOpacity(0.25),
+                              offset: Offset(0, 2),
+                              blurRadius: 5.0,
+                            ),
+                          ],
+                        ),
+                        child: TextFormField(
+                          readOnly: true,
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: Colors.white,
+                            hintText: "Search claim here",
+                            hintStyle: TextStyle(fontSize: 15.sp),
+                            suffixIcon: Icon(
+                              Icons.search,
+                              color: AppColors.deep_orange,
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(5),
+                                borderSide: BorderSide(color: Colors.white24)),
+                            enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(5),
+                                borderSide: BorderSide(color: Colors.white)),
+                          ),
+                          onTap: () => Navigator.push(
+                              context,
+                              CupertinoPageRoute(
+                                  builder: (_) => SearchScreen())),
+                        ),
+                      ))),
+              //Menu
+            ])),
+        SizedBox(
+          height: 5.h,
+        ),
+        Expanded(
+          child: ListView.builder(
+              scrollDirection: Axis.vertical,
+              itemCount: _claims.length,
+              itemBuilder: (_, index) {
+                return GestureDetector(
+                  onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => HappyCallDetails(_claims[index]))),
+                  child: Card(
+                    margin: EdgeInsets.only(left: 15, right: 15, top: 16),
+                    elevation: 3,
+                    child: Column(
+                      children: [
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Text(
+                          "${_claims[index]["Id"]}",
+                          style: TextStyle(
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold,
+                            color: Color.fromARGB(255, 255, 136, 34),
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(left: 10, top: 10),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.today,
+                                color: Color.fromARGB(255, 255, 136, 34)
+                                    .withOpacity(0.5),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(left: 3),
+                              ),
+                              Text(
+                                "Claiming date : ",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Color.fromARGB(255, 255, 136, 34),
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(left: 3),
+                              ),
+                              Text("${_claims[index]["CreatedAt"]}"),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(left: 10, top: 10),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.location_history_rounded,
+                                color: Color.fromARGB(255, 255, 136, 34)
+                                    .withOpacity(0.5),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(left: 3),
+                              ),
+                              Text(
+                                "Customer : ",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Color.fromARGB(255, 255, 136, 34),
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(left: 3),
+                              ),
+                              Row(
+                                children: [
+                                  Text("${_claims[index]["Client"][1]}"),
+                                  Padding(
+                                    padding: EdgeInsets.only(left: 2),
+                                  ),
+                                  Text("${_claims[index]["Client"][2]}"),
+                                ],
+                              )
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(left: 10, top: 10),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.location_on, //location_history_rounded,
+                                color: Color.fromARGB(255, 255, 136, 34)
+                                    .withOpacity(0.5),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(left: 3),
+                              ),
+                              Text(
+                                "Location : ",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Color.fromARGB(255, 255, 136, 34),
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(left: 3),
+                              ),
+                              Row(
+                                children: [
+                                  Text("${_claims[index]["Client"][7]} , "),
+                                  Padding(
+                                    padding: EdgeInsets.only(left: 2),
+                                  ),
+                                  Text("${_claims[index]["Client"][6]}"),
+                                ],
+                              )
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(left: 10, top: 10),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.view_in_ar_rounded,
+                                color: Color.fromARGB(255, 255, 136, 34)
+                                    .withOpacity(0.5),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(left: 3),
+                              ),
+                              Text(
+                                "Product model : ",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Color.fromARGB(255, 255, 136, 34),
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(left: 3),
+                              ),
+                              Text("${_claims[index]["Product"][2]}"),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(left: 10, top: 10),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.sticky_note_2_rounded,
+                                color: Color.fromARGB(255, 255, 136, 34)
+                                    .withOpacity(0.5),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(left: 3),
+                              ),
+                              Text(
+                                "Warranty : ",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Color.fromARGB(255, 255, 136, 34),
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(left: 3),
+                              ),
+                              Text("${_claims[index]["Product"][3]}"),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(left: 10, top: 10),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.verified_rounded,
+                                color: Color.fromARGB(255, 255, 136, 34)
+                                    .withOpacity(0.5),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(left: 3),
+                              ),
+                              Text(
+                                "Status : ",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Color.fromARGB(255, 255, 136, 34),
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(left: 3),
+                              ),
+                              Text("${_claims[index]["Status"]}"),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(left: 10, top: 10),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.speaker_notes_rounded,
+                                color: Color.fromARGB(255, 255, 136, 34)
+                                    .withOpacity(0.5),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(left: 3),
+                              ),
+                              Text(
+                                "Reason: ",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Color.fromARGB(255, 255, 136, 34),
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(left: 3),
+                              ),
+                              Text("${_claims[index]["Reason"]}"),
+                            ],
+                          ),
+                        ),
+                        Text(""),
+                      ],
+                    ),
+                  ),
+                );
+              }),
+        )
+      ]))),
+    );
+  }
+}

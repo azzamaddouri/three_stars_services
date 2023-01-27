@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "420297880809",
+    "project_id": "threestarservices-34441",
+    "storage_bucket": "threestarservices-34441.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:420297880809:android:bfd4d6622797d941f26c78",
+        "android_client_info": {
+          "package_name": "com.example.three_stars_services"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "420297880809-g269ir61n0ruke5nur90gqdquq77v08s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAvlgC8zvv_rVKKF65jOZg25uAD9r_-7mI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "420297880809-g269ir61n0ruke5nur90gqdquq77v08s.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
